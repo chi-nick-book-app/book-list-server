@@ -16,7 +16,7 @@ const PORT = process.env.PORT;
 // const conString = 'postgres://localhost:5432/books_app';
 
 //For linux
-// const conString = "postgresql://postgres:1234@localhost:5432/books_app";
+// const conString = "postgresql://chi:1234@localhost:5432/books_app";
 // const conString = process.env.DATABASE_URL;
 
 const client = new pg.Client(process.env.DATABASE_URL);
@@ -27,18 +27,87 @@ client.on('error', err => console.log(err));
 app.use(cors());
 
 //API Endpoints
+
+
+//app.post create book
+app.post('api/v1/books', (req, res) => {
+    let SQL = `
+INSERT INTO books(title, author, isbn, image_url, description)
+VALUES($1, $2, $3, $4, $5);`;
+    let values = [
+        req.body.title,
+        req.body.author,
+        req.body.isbn,
+        req.body.image_url,
+        req.body.description];
+    client.query(SQL, values)
+        .then(() => res.send('insert complete'))
+        .catch(console.error);
+});
+// app.get  pick one book
+app.get('/api/v1/books/:id', (req, res) => {
+    let SQL = `SELECT * FROM books WHERE book_id=$1;`;
+    let values = [req.params.id];
+    client.query(SQL, values)
+        .then(() => res.send('whatever,just pick one !'))
+        .catch(console.error);
+
+
+});
+
+//app.put   update books
+app.put('/api/v1/books/:id', (req, res) => {
+    let SQL =
+        `UPDATE books 
+        SET title=$2, author=$3, isbn=$4, image_url=$5, description=$6
+        WHERE book_id=$1;`;
+
+
+    let values = [
+        req.params.id,
+        req.body.title,
+        req.body.author,
+        req.body.isbn,
+        req.body.image_url,
+        req.body.description];
+
+
+    client.query(SQL, values)
+        .then(() => res.send('update complete'))
+        .catch(console.error);
+
+
+    // app.post
+
+});
+
+// ${req.params.id}
+//delete one books
+app.delete('/api/v1/books/:id', (req, res) => {
+    let SQL = `DELETE FROM books WHERE book_id=$1;`;
+    let values = [req.params.id];
+    client.query(SQL, values)
+        .then(() => res.send('Delete complete'))
+        .catch(console.error);
+});
+
+
+//request all the books
+
 app.get('/api/v1/books', (req, res) => {
 
     console.log('OMG I am handling a GET request by a client !!');
     let SQL = `SELECT *  FROM books;`;
     client.query(SQL)
-    .then(results => res.send(results.rows))
-    .catch(console.error);
+        .then(results => res.send(results.rows))
+        .catch(console.error);
     // res.send('OMG I am in contact with the server !!!!!');
 
 
 
 });
+
+
 
 
 //SETUP 404
