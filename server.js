@@ -8,7 +8,7 @@ const pg = require('pg');
 //Application Setup
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 //Database Setup
 
@@ -16,7 +16,9 @@ const PORT = process.env.PORT;
 // const conString = 'postgres://localhost:5432/books_app';
 
 //For linux
+//connect to localhost
 // const conString = "postgresql://chi:1234@localhost:5432/books_app";
+//connent to heroku
 const conString = process.env.DATABASE_URL;
 const client = new pg.Client(conString);
 
@@ -69,7 +71,7 @@ app.put('/api/v1/books/:id', (req, res) => {
         .catch(console.error);
 
 
-   
+
 
 });
 
@@ -86,11 +88,11 @@ app.delete('/api/v1/books/:id', (req, res) => {
 // app.get  pick one book
 app.get('/api/v1/books/:id', (req, res) => {
 
-    let SQL = `SELECT * FROM books WHERE book_id=${req.params.id};`;
+    let SQL = `SELECT * FROM books WHERE book_id=$1;`;
     client.query(SQL)
         .then(results => res.send(results.rows))
         .catch(console.error);
-        console.log('whatever,just pick one !');
+    console.log('whatever,just pick one !');
 
 
 });
