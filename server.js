@@ -19,22 +19,27 @@ const PORT = process.env.PORT || 5000;
 //connect to localhost
 // const conString = "postgresql://chi:1234@localhost:5432/books_app";
 //connent to heroku
-const conString = process.env.DATABASE_URL;
-const client = new pg.Client(conString);
+// const conString = process.env.DATABASE_URL;
 
-// const client = new pg.Client(process.env.DATABASE_URL);
+// const client = new pg.Client(conString);
+const client = new pg.Client(process.env.DATABASE_URL);
 client.connect();
 client.on('error', err => console.log(err));
 
 //Application Middleweare
 app.use(cors());
 
+app.use(express.json());
+app.use(express.urlencoded({extended: true}
+));
+
 //API Endpoints
 
 
 //app.post create book
-app.post('api/v1/books', (req, res) => {
-    console.log('test the form route')
+app.post('/api/v1/books', (req, res) => {
+    console.log('test the form route');
+    console.log('req.body', req);
     let SQL = `
 INSERT INTO books(title, author, isbn, image_url, description)
 VALUES($1, $2, $3, $4, $5);`;
@@ -75,7 +80,6 @@ app.put('/api/v1/books/:id', (req, res) => {
 
 });
 
-// ${req.params.id}
 //delete one books
 app.delete('/api/v1/books/:id', (req, res) => {
     let SQL = `DELETE FROM books WHERE book_id=$1;`;
@@ -85,10 +89,11 @@ app.delete('/api/v1/books/:id', (req, res) => {
         .catch(console.error);
 });
 
+// ${req.params.id}
 // app.get  pick one book
 app.get('/api/v1/books/:id', (req, res) => {
-
-    let SQL = `SELECT * FROM books WHERE book_id=$1;`;
+    console.log(`testing getting one book with id of ${req.params.id}`)
+    let SQL = `SELECT * FROM books WHERE book_id=${req.params.id};`;
     client.query(SQL)
         .then(results => res.send(results.rows))
         .catch(console.error);
